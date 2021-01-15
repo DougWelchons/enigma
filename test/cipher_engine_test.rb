@@ -20,13 +20,13 @@ class CipherEngineTest < Minitest::Test
   def test_it_can_return_an_array_of_keys
     engine = CipherEngine.new
 
-    assert_equal [1, 12, 23, 34], engine.set_keys('01234')
+    assert_equal [1, 12, 23, 34], engine.generate_keys('01234')
   end
 
   def test_it_can_set_an_array_of_offsets
     engine = CipherEngine.new
 
-    assert_equal [4, 4, 4, 1], engine.set_offsets(15012021)
+    assert_equal [4, 4, 4, 1], engine.generate_offsets(15_012_021)
   end
 
   def test_it_car_return_a_set_of_encryption_keys
