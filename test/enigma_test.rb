@@ -39,7 +39,36 @@ class EnigmaTest < Minitest::Test
   end
 
   def test_it_can_encrypt_with_only_a_key
-    encrypted = enigma.encrypt("hello world", "02715")
+    enigma = Enigma.new
+    expected = {
+                 encryption: "keder ohulw",
+                 key: "02715",
+                 date: "#{Time.now}"
+               }
 
+    assert_equal expected, enigma.encrypt("hello world", "02715")
+  end
+
+  def test_it_can_decrypt_with_only_a_key
+    enigma = Enigma.new
+    encrypted = enigma.encrypt("hello world", "02715")
+    expected = {
+                 decryption: "hello world",
+                 key: "02715",
+                 date: "#{Time.now}"
+               }
+
+    assert_equal expected, enigma.decrypt(encrypted[:encryption], "02715")
+  end
+
+  def test_it_can_encrypt_without_a_key
+    enigma = Enigma.new
+    expected = {
+                 encryption: "keder ohulw",
+                 key: "02715",
+                 date: "#{Time.now}"
+               }
+
+    assert_equal expected, enigma.encrypt("hello world")
   end
 end
