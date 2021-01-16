@@ -9,22 +9,56 @@ class Enigma
     @engine = CipherEngine.new
   end
 
-  def encrypt(message, key = @engine.key_gen, date = Time.now.strftime('%d%m%Y'))
+  def encryption(argv)
+    message = IO.read(argv[0]).delete("\n")
+    writer_file = argv[1]
+    key = if argv[2].nil?
+      @engine.key_gen
+    else
+      argv[2]
+    end
+    date = if argv[3].nil?
+      Time.now.strftime('%d%m%Y')
+    else
+      argv[3]
+    end
+    encrypt(message, writer_file, key, date)
+  end
+
+  def decryption(argv)
+    message = IO.read(argv[0]).delete("\n")
+    writer_file = argv[1]
+    key = if argv[2].nil?
+      @engine.key_gen
+    else
+      argv[2]
+    end
+    date = if argv[3].nil?
+      Time.now.strftime('%d%m%Y')
+    else
+      argv[3]
+    end
+    decrypt(message, writer_file, key, date)
+  end
+
+  def encrypt(message, writer_file, key, date)
     key_set = @engine.encryption_keys(key, date).rotate(3)
-    encryption = split(message).map do |character|
+    encryption_array = split(message).map do |character|
       key_set = key_set.rotate
       @base[((@base.index(character) + key_set.first) % 27)]
     end
-    encrypt_return_message(encryption.join, key, date)
+    File.write(writer_file, encryption_array.join)
+    encrypt_return_message(encryption_array.join, key, date)
   end
 
-  def decrypt(message, key = @engine.key_gen, date = Time.now.strftime('%d%m%Y'))
+  def decrypt(message, writer_file, key, date)
     key_set = @engine.encryption_keys(key, date).rotate(3)
-    encryption = split(message).map do |character|
+    decryption_array = split(message).map do |character|
       key_set = key_set.rotate
       @base[((@base.index(character) - key_set.first) % 27)]
     end
-    decrypt_return_message(encryption.join, key, date)
+    File.write(writer_file, decryption_array.join)
+    decrypt_return_message(decryption_array.join, key, date)
   end
 
   def encrypt_return_message(message, key, date)
