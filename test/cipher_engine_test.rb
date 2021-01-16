@@ -9,14 +9,6 @@ class CipherEngineTest < Minitest::Test
     assert_instance_of CipherEngine, engine
   end
 
-  def test_it_can_generate_a_random_key
-    engine = CipherEngine.new
-    key_length = engine.key_gen.length
-
-    assert_equal 5, key_length
-    assert_instance_of String, engine.key_gen
-  end
-
   def test_it_can_return_an_array_of_keys
     engine = CipherEngine.new
 
@@ -33,5 +25,11 @@ class CipherEngineTest < Minitest::Test
     engine = CipherEngine.new
 
     assert_equal [5, 16, 27, 35], engine.encryption_keys('01234', '15012021')
+  end
+
+  def test_it_can_split_messages
+    engine = CipherEngine.new
+
+    assert_equal ['h', 'e', 'l', 'l', 'o'], engine.split("hello")
   end
 end
