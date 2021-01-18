@@ -1,6 +1,5 @@
-# this is the class used for prossesing the keys and dates into usable key_sets
-
 class CipherEngine
+
   def encryption_keys(key, date)
     keys = generate_keys(key)
     offsets = generate_offsets(date.to_i)
@@ -9,10 +8,6 @@ class CipherEngine
       total_offsets << each.sum
     end
     total_offsets
-  end
-
-  def key_gen
-    rand(100_000).to_s.rjust(5, '0')
   end
 
   def generate_keys(key)
@@ -25,5 +20,18 @@ class CipherEngine
 
   def generate_offsets(date)
     (date * date).digits[0..3].reverse
+  end
+
+  def run_cipher(message, key_set)
+    split(message).map do |character|
+      key_set = key_set.rotate
+      if @base.include?(character)
+        @base[((@base.index(character) + key_set.first) % 27)]
+      end
+    end.join
+  end
+
+  def split(message)
+    message.split('')
   end
 end
