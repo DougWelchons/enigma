@@ -1,83 +1,39 @@
-#this is the interface between the runner files and the encryption/decryption proccess
-
-require './lib/cipher_engine'
+require './lib/encipher'
+require './lib/decipher'
 
 class Enigma
 
-  def initialize
-    @base = ('a'..'z').to_a << ' '
-    @engine = CipherEngine.new
+  def key_gen
+    rand(100_000).to_s.rjust(5, '0')
   end
 
-  def encryption(argv)
-    message = IO.read(argv[0]).delete("\n")
-    writer_file = argv[1]
-    key = if argv[2].nil?
-      @engine.key_gen
+  def parse_data_encrypt(message, key_and_date)
+    if key_and_date.count == 2
+      encrypt(message, key_and_date[0], key_and_date[1])
+    elsif key_and_date.count == 1
+      encrypt(message, key_and_date[0])
     else
-      argv[2]
+      encrypt(message)
     end
-    date = if argv[3].nil?
-      Time.now.strftime('%d%m%Y')
+  end
+
+  def parse_data_decrypt(message, key_and_date)
+    if key_and_date.count == 2
+      decrypt(message, key_and_date[0], key_and_date[1])
+    elsif key_and_date.count == 1
+      decrypt(message, key_and_date[0])
     else
-      argv[3]
+      decrypt(message)
     end
-    encrypt(message, writer_file, key, date)
   end
 
-  def decryption(argv)
-    message = IO.read(argv[0]).delete("\n")
-    writer_file = argv[1]
-    key = if argv[2].nil?
-      @engine.key_gen
-    else
-      argv[2]
-    end
-    date = if argv[3].nil?
-      Time.now.strftime('%d%m%Y')
-    else
-      argv[3]
-    end
-    decrypt(message, writer_file, key, date)
+  def encrypt(message, key = key_gen, date = Time.now.strftime('%d%m%y'))
+    encipher = Encipher.new
+    encipher.cipher(message, key, date)
   end
 
-  def encrypt(message, writer_file, key, date)
-    key_set = @engine.encryption_keys(key, date).rotate(3)
-    encryption_array = split(message).map do |character|
-      key_set = key_set.rotate
-      @base[((@base.index(character) + key_set.first) % 27)]
-    end
-    File.write(writer_file, encryption_array.join)
-    encrypt_return_message(encryption_array.join, key, date)
-  end
-
-  def decrypt(message, writer_file, key, date)
-    key_set = @engine.encryption_keys(key, date).rotate(3)
-    decryption_array = split(message).map do |character|
-      key_set = key_set.rotate
-      @base[((@base.index(character) - key_set.first) % 27)]
-    end
-    File.write(writer_file, decryption_array.join)
-    decrypt_return_message(decryption_array.join, key, date)
-  end
-
-  def encrypt_return_message(message, key, date)
-    {
-      encryption: message,
-      key: key,
-      date: date
-    }
-  end
-
-  def decrypt_return_message(message, key, date)
-    {
-      decryption: message,
-      key: key,
-      date: date
-    }
-  end
-
-  def split(message)
-    message.split('')
+  def decrypt(message, key = key_gen, date = Time.now.strftime('%d%m%y'))
+    decipher = Decipher.new
+    decipher.cipher(message, key, date)
   end
 end
