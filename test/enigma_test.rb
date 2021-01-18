@@ -1,5 +1,9 @@
+require 'simplecov'
+SimpleCov.start
+
 require 'minitest/autorun'
 require 'minitest/pride'
+require 'mocha/minitest'
 require './lib/enigma'
 
 class EnigmaTest < Minitest::Test
@@ -7,6 +11,13 @@ class EnigmaTest < Minitest::Test
     enigma = Enigma.new
 
     assert_instance_of Enigma, enigma
+  end
+
+  def test_it_can_generate_a_random_key
+    enigma = Enigma.new
+
+    assert_equal 5, enigma.key_gen.length
+    assert_instance_of String, enigma.key_gen
   end
 
   def test_it_can_encrypt_with_a_key_and_date
@@ -37,12 +48,12 @@ class EnigmaTest < Minitest::Test
   end
 
   def test_it_can_encrypt_with_only_a_key
-    skip
     enigma = Enigma.new
+    Time.stubs(:now).returns(Time.mktime(95, 8, 4))
     expected = {
                   encryption: 'keder ohulw',
                   key: '02715',
-                  date: Time.now.strftime('%d%m%Y')
+                  date: '040895'
                }
 
     assert_equal expected, enigma.encrypt('hello world', '02715')
@@ -54,21 +65,44 @@ class EnigmaTest < Minitest::Test
     expected = {
                   decryption: 'hello world',
                   key: '02715',
-                  date: Time.now.strftime('%d%m%Y')
+                  date: Time.now.strftime('%d%m%y')
                }
 
     assert_equal expected, enigma.decrypt(encrypted[:encryption], '02715')
   end
 
   def test_it_can_encrypt_without_a_key
-    skip
     enigma = Enigma.new
+    enigma.stubs(:key_gen).returns('02715')
+    Time.stubs(:now).returns(Time.mktime(95, 8, 4))
     expected = {
                   encryption: 'keder ohulw',
                   key: '02715',
-                  date: Time.now.strftime('%d%m%Y')
+                  date: '040895'
                }
 
     assert_equal expected, enigma.encrypt('hello world')
+  end
+
+  def test_it_can_parse_encryption_data
+    enigma = Enigma.new
+    enigma.stubs(:encrypt).with('hello worls', '12345', '010121').returns('option1')
+    enigma.stubs(:encrypt).with('hello worls', '12345').returns('option2')
+    enigma.stubs(:encrypt).with('hello worls').returns('option3')
+
+    assert_equal 'option1', enigma.parse_data_encrypt('hello worls', ['12345', '010121'])
+    assert_equal 'option2', enigma.parse_data_encrypt('hello worls', ['12345'])
+    assert_equal 'option3', enigma.parse_data_encrypt('hello worls', [])
+  end
+
+  def test_it_can_parse_decryption_data
+    enigma = Enigma.new
+    enigma.stubs(:decrypt).with('keder ohulw', '12345', '010121').returns('option1')
+    enigma.stubs(:decrypt).with('keder ohulw', '12345').returns('option2')
+    enigma.stubs(:decrypt).with('keder ohulw').returns('option3')
+
+    assert_equal 'option1', enigma.parse_data_decrypt('keder ohulw', ['12345', '010121'])
+    assert_equal 'option2', enigma.parse_data_decrypt('keder ohulw', ['12345'])
+    assert_equal 'option3', enigma.parse_data_decrypt('keder ohulw', [])
   end
 end
