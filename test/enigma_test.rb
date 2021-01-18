@@ -86,23 +86,23 @@ class EnigmaTest < Minitest::Test
 
   def test_it_can_parse_encryption_data
     enigma = Enigma.new
-    enigma.stubs(:encrypt).with('hello worls', '12345', '010121').returns("option1")
-    enigma.stubs(:encrypt).with('hello worls', '12345').returns("option2")
-    enigma.stubs(:encrypt).with('hello worls').returns("option3")
+    enigma.stubs(:encrypt).with('hello worls', '12345', '010121').returns('option1')
+    enigma.stubs(:encrypt).with('hello worls', '12345').returns('option2')
+    enigma.stubs(:encrypt).with('hello worls').returns('option3')
 
-    assert_equal "option1", enigma.parse_data_encrypt('hello worls', ['12345', '010121'])
-    assert_equal "option2", enigma.parse_data_encrypt('hello worls', ['12345'])
-    assert_equal "option3", enigma.parse_data_encrypt('hello worls', [])
+    assert_equal 'option1', enigma.parse_data_encrypt('hello worls', ['12345', '010121'])
+    assert_equal 'option2', enigma.parse_data_encrypt('hello worls', ['12345'])
+    assert_equal 'option3', enigma.parse_data_encrypt('hello worls', [])
   end
 
   def test_it_can_parse_decryption_data
     enigma = Enigma.new
-    enigma.stubs(:decrypt).with('keder ohulw', '12345', '010121').returns("option1")
-    enigma.stubs(:decrypt).with('keder ohulw', '12345').returns("option2")
-    enigma.stubs(:decrypt).with('keder ohulw').returns("option3")
+    enigma.stubs(:decrypt).with('keder ohulw', '12345', '010121').returns('option1')
+    enigma.stubs(:decrypt).with('keder ohulw', '12345').returns('option2')
+    enigma.stubs(:decrypt).with('keder ohulw').returns('option3')
 
-    assert_equal "option1", enigma.parse_data_decrypt('keder ohulw', ['12345', '010121'])
-    assert_equal "option2", enigma.parse_data_decrypt('keder ohulw', ['12345'])
-    assert_equal "option3", enigma.parse_data_decrypt('keder ohulw', [])
+    assert_equal 'option1', enigma.parse_data_decrypt('keder ohulw', ['12345', '010121'])
+    assert_equal 'option2', enigma.parse_data_decrypt('keder ohulw', ['12345'])
+    assert_equal 'option3', enigma.parse_data_decrypt('keder ohulw', [])
   end
 end
