@@ -1,5 +1,6 @@
 require './lib/encipher'
 require './lib/decipher'
+require './lib/code_break'
 
 class Enigma
 
@@ -27,6 +28,14 @@ class Enigma
     end
   end
 
+  def parse_data_crack(message, key_and_date)
+    if key_and_date.count == 1
+      crack(message, key_and_date[0])
+    else
+      crack(message)
+    end
+  end
+
   def encrypt(message, key = key_gen, date = Time.now.strftime('%d%m%y'))
     encipher = Encipher.new
     encipher.cipher(message, key, date)
@@ -35,5 +44,10 @@ class Enigma
   def decrypt(message, key = key_gen, date = Time.now.strftime('%d%m%y'))
     decipher = Decipher.new
     decipher.cipher(message, key, date)
+  end
+
+  def crack(message, date = Time.now.strftime('%d%m%y'))
+    crack = CodeBreak.new
+    crack.crack(message, date)
   end
 end
