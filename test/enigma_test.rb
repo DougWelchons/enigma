@@ -84,6 +84,29 @@ class EnigmaTest < Minitest::Test
     assert_equal expected, enigma.encrypt('hello world')
   end
 
+  def test_it_can_crack_an_encryption_with_a_date
+    enigma = Enigma.new
+    expected = {
+                  decryption: 'hello world end',
+                  key: [19, -14, -5, -5],
+                  date: '291018'
+                }
+
+    assert_equal expected, enigma.crack('vjqtbeaweqihssi', '291018')
+  end
+
+  def test_it_can_crack_an_encryption_without_a_date
+    enigma = Enigma.new
+    Time.stubs(:now).returns(Time.mktime(95, 8, 4))
+    expected = {
+                  decryption: 'hello world end',
+                  key: [19, -14, -5, -5],
+                  date: '291018'
+                }
+
+    assert_equal expected, enigma.crack('vjqtbeaweqihssi', '291018')
+  end
+
   def test_it_can_parse_encryption_data
     enigma = Enigma.new
     enigma.stubs(:encrypt).with('hello worls', '12345', '010121').returns('option1')
@@ -104,5 +127,14 @@ class EnigmaTest < Minitest::Test
     assert_equal 'option1', enigma.parse_data_decrypt('keder ohulw', ['12345', '010121'])
     assert_equal 'option2', enigma.parse_data_decrypt('keder ohulw', ['12345'])
     assert_equal 'option3', enigma.parse_data_decrypt('keder ohulw', [])
+  end
+
+  def test_it_can_parse_code_break_data
+    enigma = Enigma.new
+    enigma.stubs(:crack).with('keder ohulw', '010121').returns('option1')
+    enigma.stubs(:crack).with('keder ohulw').returns('option2')
+
+    assert_equal 'option1', enigma.parse_data_crack('keder ohulw', ['010121'])
+    assert_equal 'option2', enigma.parse_data_crack('keder ohulw', [])
   end
 end
